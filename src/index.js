@@ -1,33 +1,46 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { hashHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
+import { HashRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
-import Routes from './Routes';
 import createStore from './reducers/';
 import registerServiceWorker from './registerServiceWorker';
+
+import App from './containers/App';
+
+import 'whatwg-fetch';
+import 'normalize.css';
 import './index.css';
 
 const store = createStore();
-const history = syncHistoryWithStore(hashHistory, store);
+const containerNode = document.getElementById('root');
 
-const render = Component => {
-  ReactDOM.render(
-    <AppContainer>
-      <Provider store={store}>
-        <Component history={history} />
-      </Provider>
-    </AppContainer>,
-    document.getElementById('root')
-  );
-};
-
-render(Routes);
-registerServiceWorker();
+ReactDOM.render(
+  <AppContainer>
+    <Provider store={store}>
+      <Router>
+        <App />
+      </Router>
+    </Provider>
+  </AppContainer>,
+  containerNode
+);
 
 if (module.hot) {
-  module.hot.accept('./Routes', () => {
-    render(Routes);
+  module.hot.accept('./containers/App', () => {
+    const NextApp = require('./containers/App').default;
+
+    ReactDOM.render(
+      <AppContainer>
+        <Provider store={store}>
+          <Router>
+            <NextApp />
+          </Router>
+        </Provider>
+      </AppContainer>,
+      containerNode
+    );
   });
 }
+
+registerServiceWorker();
